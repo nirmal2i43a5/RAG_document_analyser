@@ -226,6 +226,15 @@ async def query_documents(request: QueryRequest):
 
             Question: {request.query}
 
+            Instructions for your answer:
+            1. Use markdown formatting to structure your response
+            2. Include a clear heading/title at the top when appropriate
+            3. Use bullet points or numbered lists for multiple items or steps
+            4. Bold important terms or key points
+            5. Use subheadings to organize longer responses
+            6. Keep your answer concise and well-structured
+            7. If appropriate, include a brief summary at the end
+
             Answer:
             """
             
