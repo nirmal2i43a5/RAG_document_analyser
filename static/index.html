@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Analyzer RAG</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            width: 280px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+        .nav-link {
+            padding: 0.8rem 1rem;
+            color: #495057;
+            border-radius: 0;
+            margin-bottom: 5px;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: #e9ecef;
+            color: #212529;
+        }
+        .nav-link i {
+            margin-right: 10px;
+        }
+        .chat-container {
+            height: calc(100vh - 170px);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-history {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .chat-input {
+            margin-top: 20px;
+            position: relative;
+        }
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 15px 15px 0 15px;
+            margin-left: auto;
+            border: 1px solid #d1e7ff;
+        }
+        .bot-message {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px 15px 15px 0;
+            margin-right: auto;
+            border: 1px solid #e9ecef;
+        }
+        .document-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .document-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #007bff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .section-hidden {
+            display: none;
+        }
+        #uploadSection .card {
+            border: 1px dashed #dee2e6;
+            background-color: #f8f9fa;
+        }
+        #uploadSection .card:hover {
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4 class="mb-0">Document Analyzer</h4>
+            <p class="text-muted mb-0">Powered by RAG</p>
+        </div>
+        <div class="p-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-section="chatSection">
+                        <i class="bi bi-chat-square-text"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="uploadSection">
+                        <i class="bi bi-file-earmark-arrow-up"></i> Upload Documents
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="documentsSection">
+                        <i class="bi bi-folder2-open"></i> Manage Documents
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="configSection">
+                        <i class="bi bi-gear"></i> Configuration
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="mt-3">
+                <button class="btn btn-outline-danger btn-sm w-100" id="clearBtn">
+                    <i class="bi bi-trash"></i> Clear All Documents
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Chat Section -->
+        <div id="chatSection" class="section">
+            <h4 class="mb-4">Chat with your Documents</h4>
+            <div class="chat-container">
+                <div class="chat-history" id="chatHistory">
+                    <div class="message bot-message">
+                        Hello! I'm your document assistant. Upload PDFs and ask me questions about them.
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="queryInput" placeholder="Ask a question about your documents...">
+                        <button class="btn btn-primary" id="queryBtn">Send</button>
+                    </div>
+                    <span id="queryLoading" class="loading mt-2" style="display: none;"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="uploadSection" class="section section-hidden">
+            <h4 class="mb-4">Upload Documents</h4>
+            <div class="card mb-4 p-4">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="text-center p-4">
+                        <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
+                        <h5 class="mt-3">Drag & Drop Files Here</h5>
+                        <p class="text-muted">or</p>
+                        <div class="mb-3">
+                            <input class="form-control" type="file" id="pdfFiles" name="files" accept=".pdf" multiple hidden>
+                            <button type="button" class="btn btn-outline-primary" id="browseBtn">Browse Files</button>
+                        </div>
+                        <p class="text-muted small">Supported formats: PDF</p>
+                    </div>
+                    <div id="filesList" class="mt-3"></div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>Upload Files</button>
+                        <span id="uploadLoading" class="loading" style="display: none;"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Documents Management Section -->
+        <div id="documentsSection" class="section section-hidden">
+            <h4 class="mb-4">Manage Documents</h4>
+            <div class="row" id="documentsList">
+                <div class="col-12 text-center text-muted py-5">
+                    <i class="bi bi-inbox fs-1"></i>
+                    <p class="mt-3">No documents uploaded yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div id="configSection" class="section section-hidden">
+            <h4 class="mb-4">Configuration</h4>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="configForm">
+                        <div class="mb-3">
+                            <label for="apiUrlInput" class="form-label">API URL</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="apiUrlInput" placeholder="https://your-api-url.com">
+                                <button class="btn btn-primary" type="submit">Save</button>
+                            </div>
+                            <div class="form-text" id="apiUrlStatus">
+                                Current API URL: <span id="currentApiUrl">Loading...</span>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        Leave blank to use the current domain: <code id="originUrl"></code>
+                    </div>
+                    <hr>
+                    <h5 class="mt-4">Troubleshooting</h5>
+                    <div class="mt-3">
+                        <button class="btn btn-warning" id="resetUploadBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Upload Method
+                        </button>
+                        <div class="form-text">If you're having trouble uploading files, click this to reset the upload method.</div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-secondary" id="debugBtn">
+                            <i class="bi bi-bug"></i> Debug Connection
+                        </button>
+                        <div class="form-text">Run basic diagnostics to debug connection issues.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Detail Modal -->
+    <div class="modal fade" id="documentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentModalTitle">Document Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="documentModalBody">
+                    <div class="mb-3">
+                        <strong>Filename:</strong> <span id="docFilename"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Upload Time:</strong> <span id="docUploadTime"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Chunks:</strong> <span id="docChunks"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>ID:</strong> <span id="docId"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html> 

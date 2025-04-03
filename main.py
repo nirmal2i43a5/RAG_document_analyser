@@ -4,6 +4,8 @@ import tempfile
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 # from langchain.llms import OpenAI
 from langchain.chains import RetrievalQA
 from typing import List
@@ -35,6 +37,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files directory
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Initialize components
 pdf_processor = PDFProcessor()
@@ -72,7 +77,6 @@ class MistralAIWrapper(LLM):
     ) -> str:
         # try:
         # Send request to Mistral API
-        print(prompt, "---------------Inside LLM Call--------------------------")
         messages = [ 
                     ChatMessage(role="user", content=prompt) 
                     ]
@@ -84,7 +88,6 @@ class MistralAIWrapper(LLM):
 
         # Debug information
         print(f"Response type: {type(response)}")
-        print(response, "-----------------------------------------")
 
         # Handle different response formats
         try:
@@ -252,16 +255,8 @@ async def clear_documents():
 
 @app.get("/")
 async def root():
-    """Root endpoint that redirects to docs or provides API info."""
-    return {
-        "message": "Document Analyzer RAG API",
-        "endpoints": {
-            "POST /upload": "Upload PDF documents",
-            "POST /query": "Query the document collection",
-            "POST /clear": "Clear all documents",
-            "GET /docs": "API documentation"
-        }
-    }
+    """Serve the main HTML page"""
+    return FileResponse('static/index.html')
 
 if __name__ == "__main__":
     import uvicorn
