@@ -472,11 +472,6 @@
                         <i class="bi bi-folder2-open"></i> Manage Documents
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="configSection">
-                        <i class="bi bi-gear"></i> Configuration
-                    </a>
-                </li>
             </ul>
             
             <hr class="border-light">
@@ -514,13 +509,7 @@
                 <div class="chat-history" id="chatHistory">
                     <div class="message bot-message">
                         <h2>Welcome to Document Analyzer!</h2>
-                        <p>I'm your AI assistant powered by RAG technology. I can help you analyze and extract information from your documents.</p>
-                        <p>Here's what you can do:</p>
-                        <ul>
-                            <li><strong>Upload PDFs</strong> - Add your documents to the knowledge base</li>
-                            <li><strong>Ask questions</strong> - Query information from your documents</li>
-                            <li><strong>Manage documents</strong> - View and organize your uploaded files</li>
-                        </ul>
+                       
                         <p>To get started, upload some PDF documents or ask me a question if you've already uploaded documents.</p>
                     </div>
                 </div>
@@ -586,43 +575,7 @@
                 </div>
             </div>
             
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="bi bi-lightbulb text-warning"></i>
-                                Processing Information
-                            </h5>
-                            <p class="card-text">When you upload PDF files, they are:</p>
-                            <ol>
-                                <li>Extracted into text</li>
-                                <li>Split into smaller chunks</li>
-                                <li>Embedded using vector representations</li>
-                                <li>Stored in a vector database for fast retrieval</li>
-                            </ol>
-                            <p class="card-text text-muted">This process enables semantic search and retrieval based on meaning rather than just keywords.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="bi bi-exclamation-triangle text-danger"></i>
-                                Important Notes
-                            </h5>
-                            <ul>
-                                <li>PDF files should contain selectable text, not just images</li>
-                                <li>Text-based PDFs work best for accurate information extraction</li>
-                                <li>Scanned documents may not be processed correctly without OCR</li>
-                                <li>Protected PDFs with encryption cannot be processed</li>
-                            </ul>
-                            <p class="card-text text-muted">For best results, use digital PDFs rather than scanned documents.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          
         </div>
 
         <!-- Documents Management Section -->
@@ -646,114 +599,6 @@
                     <button class="btn btn-primary mt-2" id="goToUploadBtn">
                         <i class="bi bi-file-earmark-arrow-up"></i> Upload Documents
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Configuration Section -->
-        <div id="configSection" class="section section-hidden">
-            <h4 class="mb-4">Configuration</h4>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card config-card mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0">API Settings</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="configForm">
-                                <div class="mb-3">
-                                    <label for="apiUrlInput" class="form-label">API URL</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="bi bi-link-45deg"></i>
-                                        </span>
-                                        <input type="url" class="form-control" id="apiUrlInput" placeholder="https://your-api-url.com">
-                                        <button class="btn btn-primary" type="submit">Save</button>
-                                    </div>
-                                    <div class="form-text" id="apiUrlStatus">
-                                        Current API URL: <span id="currentApiUrl">Loading...</span>
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="alert alert-info d-flex align-items-center">
-                                <i class="bi bi-info-circle me-2"></i> 
-                                <div>
-                                    Leave blank to use the current domain: <code id="originUrl"></code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="card config-card mb-4">
-                        <div class="card-header bg-transparent">
-                            <h5 class="mb-0">System Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <p><strong>Storage:</strong> <span id="vectorStoreSize">Loading...</span></p>
-                                <div class="progress mb-2">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" id="storageProgress"></div>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <p><strong>Document Statistics:</strong></p>
-                                <ul class="list-group">
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Documents
-                                        <span class="badge bg-primary rounded-pill" id="statsDocumentCount">0</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Text Chunks
-                                        <span class="badge bg-primary rounded-pill" id="statsChunkCount">0</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary" id="testConnectionBtn">
-                                    <i class="bi bi-broadcast"></i> Test API Connection
-                                </button>
-                                <button class="btn btn-outline-danger" id="clearAllDataBtn">
-                                    <i class="bi bi-trash"></i> Clear All Data
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card config-card">
-                <div class="card-header bg-transparent">
-                    <h5 class="mb-0">Troubleshooting</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="d-grid">
-                                <button class="btn btn-outline-secondary" id="debugConnectionBtn">
-                                    <i class="bi bi-bug"></i> Debug Connection
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="d-grid">
-                                <button class="btn btn-outline-secondary" id="resetUploadMethodBtn">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Reset Upload Method
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="d-grid">
-                                <button class="btn btn-outline-secondary" id="exportLogsBtn">
-                                    <i class="bi bi-file-earmark-text"></i> Export Logs
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

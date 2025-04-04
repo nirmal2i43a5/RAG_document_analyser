@@ -6,6 +6,8 @@ import os
 from mistralai.client import MistralClient
 from mistralai.models.embeddings import EmbeddingObject
 from langchain.embeddings.base import Embeddings
+from pdf_processor import save_registry
+
 
 class MistralEmbeddings(Embeddings):
     client: MistralClient
@@ -59,6 +61,27 @@ class VectorStore:
         return self.vectorstore.similarity_search(query, k=k)
 
     def clear(self):
+        """Clear all documents from the vector store."""
+        try:
+            print("Clearing vector store")
+            # Use the collection.delete method with an empty filter to delete all documents
+            self.vectorstore._collection.delete(filter={})
+            # Persist changes to disk
+            self.vectorstore.persist()
+            
+            # Also clear the document registry
+            global document_registry
+            document_registry = {}
+            # Save empty registry to file
+            save_registry()
+            
+            print("Vector store cleared successfully")
+            return True
+        except Exception as e:
+            print(f"Error clearing vector store: {str(e)}")
+            raise e
+
+    def clear_old(self):
         """Clear the vector store."""
         if os.path.exists(self.persist_directory):
             import shutil

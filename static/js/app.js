@@ -1,20 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // API URL Configuration
-    const DEFAULT_API_URL = window.location.origin;
-    const STORAGE_KEY = 'rag_api_url';
-    let API_URL = DEFAULT_API_URL;
+    const API_URL = window.location.origin;
     console.log(API_URL);
-    
-    // DOM Elements - Configuration
-    const configForm = document.getElementById('configForm');
-    const apiUrlInput = document.getElementById('apiUrlInput');
-    const currentApiUrl = document.getElementById('currentApiUrl');
-    const originUrl = document.getElementById('originUrl');
-    
-    // Set initial values
-    apiUrlInput.value = API_URL !== DEFAULT_API_URL ? API_URL : '';
-    currentApiUrl.textContent = API_URL;
-    originUrl.textContent = DEFAULT_API_URL;
     
     // DOM Elements - Navigation
     const navLinks = document.querySelectorAll('.nav-link');
@@ -152,48 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (bytes < 1024) return bytes + ' bytes';
         else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
         else return (bytes / 1048576).toFixed(1) + ' MB';
-    }
-    
-    // API URL Configuration
-    function updateApiUrl(url) {
-        // If empty, use default
-        url = url.trim() || DEFAULT_API_URL;
-        
-        // Add protocol if missing
-        if (!/^https?:\/\//i.test(url)) {
-            url = 'http://' + url;
-        }
-        
-        // Remove trailing slash
-        url = url.replace(/\/$/, '');
-        
-        // Update API URL
-        API_URL = url;
-        localStorage.setItem(STORAGE_KEY, API_URL);
-        currentApiUrl.textContent = API_URL;
-        
-        // Validate connection
-        testApiConnection();
-        
-        return url;
-    }
-    
-    // Test API connection
-    async function testApiConnection() {
-        currentApiUrl.innerHTML = `<span class="text-warning">${API_URL}</span> (Testing connection...)`;
-        
-        try {
-            // Try to reach the API root
-            const response = await fetch(`${API_URL}/`);
-            if (response.ok) {
-                currentApiUrl.innerHTML = `<span class="text-success">${API_URL}</span> (Connected)`;
-            } else {
-                currentApiUrl.innerHTML = `<span class="text-danger">${API_URL}</span> (Error: ${response.status})`;
-            }
-        } catch (error) {
-            currentApiUrl.innerHTML = `<span class="text-danger">${API_URL}</span> (Connection failed)`;
-            console.error('API connection error:', error);
-        }
     }
     
     // Fetch and display documents list
@@ -505,12 +450,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Event listeners - Config
-    configForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        updateApiUrl(apiUrlInput.value);
-    });
-    
     // Event listeners - Documents
     clearBtn.addEventListener('click', clearDocuments);
     
@@ -527,5 +466,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize
     fetchDocuments();
-    testApiConnection();
 }); 

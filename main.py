@@ -23,6 +23,7 @@ from mistralai.models.chat_completion import ChatMessage
 
 from langchain.schema import Document
 from datetime import datetime
+import json
 
 # Load environment variables
 load_dotenv()
@@ -123,8 +124,27 @@ class MistralAIWrapper(LLM):
 
 llm = MistralAIWrapper(api_key=mistral_api_key, model_name="mistral-tiny")
 
-# # Store document metadata for tracking purposes
+# Path to document registry file
+document_registry_file = "document_registry.json"
+
+# Load existing document registry
 document_registry = {}
+try:
+    if os.path.exists(document_registry_file):
+        with open(document_registry_file, "r") as f:
+            document_registry = json.load(f)
+        print(f"Loaded {len(document_registry)} documents from registry")
+except Exception as e:
+    print(f"Error loading document registry: {str(e)}")
+
+def save_registry():
+    """Save document registry to JSON file for persistence"""
+    try:
+        with open(document_registry_file, "w") as f:
+            json.dump(document_registry, f, indent=2)
+        print(f"Saved {len(document_registry)} documents to registry")
+    except Exception as e:
+        print(f"Error saving document registry: {str(e)}")
 
 @app.post("/upload")
 async def upload_documents(files: List[UploadFile] = File(...)):
@@ -145,15 +165,26 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                 # Process the PDF
                 chunks = pdf_processor.process_pdf(file_path)
                 
+                # Add proper metadata to each chunk
+                file_id = hashlib.md5(file.filename.encode()).hexdigest()
+                for i, chunk in enumerate(chunks):
+                    # Ensure each chunk has complete metadata
+                    chunk.metadata["source"] = file.filename
+                    chunk.metadata["chunk_id"] = f"{file_id}_{i}"
+                    chunk.metadata["upload_time"] = datetime.now().isoformat()
+                    chunk.metadata["page"] = chunk.metadata.get("page", 0)
+                
                 # Register document in our tracking system
-                doc_id = hashlib.md5(file.filename.encode()).hexdigest()
-                document_registry[doc_id] = {
+                document_registry[file_id] = {
                     "filename": file.filename,
-                    "upload_time": str(datetime.now()),
+                    "upload_time": datetime.now().isoformat(),
                     "chunks": len(chunks)
                 }
                 
                 vector_store.add_documents(chunks)
+        
+        # Save registry to file for persistence
+        save_registry()
         
         return {"message": f"Successfully processed {len(files)} files"}
     
@@ -165,7 +196,7 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 async def list_documents():
     """List all PDF documents saved in the database."""
     try:
-        # Return the list of documents from our registry
+        # First try from registry
         if document_registry:
             return {
                 "documents": [
@@ -179,24 +210,34 @@ async def list_documents():
                 ]
             }
         else:
-            # Try to get available documents from vector store if registry is empty
+            # Rebuild from vector store
             try:
-                print("Inside try block;;;;;;;;;;;;;;;;;;;;;;;-----------------------")
                 all_docs = vector_store.vectorstore.get()
-                # print(all_docs)
-                unique_sources = set()
+                document_dict = {}
+                
+                # Group by source file
                 for doc in all_docs.get("documents", []):
                     if "source" in doc["metadata"]:
-                        unique_sources.add(doc["metadata"]["source"])
+                        source = doc["metadata"]["source"]
+                        doc_id = hashlib.md5(source.encode()).hexdigest()
+                        
+                        if doc_id not in document_dict:
+                            document_dict[doc_id] = {
+                                "filename": os.path.basename(source),
+                                "upload_time": doc["metadata"].get("upload_time", str(datetime.now())),
+                                "chunks": 1,
+                                "id": doc_id
+                            }
+                        else:
+                            document_dict[doc_id]["chunks"] += 1
                 
+                # Return the reconstructed document list
                 return {
-                    "documents": [
-                        {"filename": os.path.basename(source), "source": source}
-                        for source in unique_sources
-                    ]
+                    "documents": list(document_dict.values())
                 }
-            except:
-                return {"documents": [], "message": "No documents found in vector store"}
+            except Exception as e:
+                print(f"Error retrieving from vector store: {str(e)}")
+                return {"documents": [], "message": f"No documents found in vector store: {str(e)}"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -261,8 +302,14 @@ async def clear_documents():
     """Clear all documents from the vector store."""
     try:
         vector_store.clear()
+        
+        # Clear document registry
+        document_registry.clear()
+        save_registry()
+        
         return {"message": "Successfully cleared all documents"}
     except Exception as e:
+        print(f"Error clearing documents: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
