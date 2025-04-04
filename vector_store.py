@@ -38,7 +38,8 @@ class VectorStore:
         self.persist_directory = persist_directory
         
         # Get Mistral API key
-        mistral_api_key = os.getenv("API_KEY")
+        # mistral_api_key = os.getenv("API_KEY")
+        mistral_api_key = "mBaX8nyDl9LyoHxkEknMAXu8bE6BJpXf"
         
         # Use Mistral embeddings
         self.embeddings = MistralEmbeddings(api_key=mistral_api_key)

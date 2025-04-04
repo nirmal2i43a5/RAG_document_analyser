@@ -46,7 +46,7 @@ pdf_processor = PDFProcessor()
 vector_store = VectorStore()
 
 # Initialize Mistral AI
-# mistral_api_key = os.getenv("MISTRAL_API_KEY")
+# mistral_api_key = os.getenv("API_KEY")
 mistral_api_key = "mBaX8nyDl9LyoHxkEknMAXu8bE6BJpXf"
 if not mistral_api_key:
     raise ValueError("MISTRAL_API_KEY environment variable is not set")
@@ -163,6 +163,7 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 @app.get("/list-documents")
 async def list_documents():
     """List all PDF documents saved in the database."""
+    print(document_registry)
     try:
         # Return the list of documents from our registry
         if document_registry:
@@ -181,6 +182,7 @@ async def list_documents():
             # Try to get available documents from vector store if registry is empty
             try:
                 all_docs = vector_store.vectorstore.get()
+                print(all_docs)
                 unique_sources = set()
                 for doc in all_docs.get("documents", []):
                     if "source" in doc["metadata"]:

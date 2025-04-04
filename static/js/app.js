@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const DEFAULT_API_URL = window.location.origin;
     const STORAGE_KEY = 'rag_api_url';
     let API_URL = DEFAULT_API_URL;
+    console.log(API_URL);
     
     // DOM Elements - Configuration
     const configForm = document.getElementById('configForm');
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const response = await fetch(`${API_URL}/list-documents`);
             const data = await response.json();
-            
+            console.log(response,"------------------------");
             if (data.documents && data.documents.length > 0) {
                 documentsList.innerHTML = '';
                 data.documents.forEach(doc => {
