@@ -7,160 +7,424 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --success-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #dee2e6;
+            --shadow-sm: 0 2px 6px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            --sidebar-width: 280px;
+        }
+        
         body {
             min-height: 100vh;
             overflow-x: hidden;
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        /* Sidebar Styling */
         .sidebar {
-            width: 280px;
+            width: var(--sidebar-width);
             min-height: 100vh;
-            background-color: #f8f9fa;
-            border-right: 1px solid #dee2e6;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-right: 1px solid var(--border-color);
             position: fixed;
             top: 0;
             left: 0;
             overflow-y: auto;
             z-index: 1000;
-            transition: all 0.3s;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
         }
+        
         .sidebar-header {
             padding: 1.5rem 1rem;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
+        
+        .sidebar-header h4 {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
         .main-content {
-            margin-left: 280px;
-            padding: 20px;
-            transition: all 0.3s;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            transition: var(--transition);
             min-height: 100vh;
         }
+        
         .nav-link {
             padding: 0.8rem 1rem;
-            color: #495057;
-            border-radius: 0;
-            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            margin: 5px 10px;
+            transition: var(--transition);
         }
+        
         .nav-link:hover, .nav-link.active {
-            background-color: #e9ecef;
-            color: #212529;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
         }
+        
         .nav-link i {
             margin-right: 10px;
         }
+        
+        /* Chat Section Styling */
         .chat-container {
-            height: calc(100vh - 170px);
+            height: calc(100vh - 180px);
             display: flex;
             flex-direction: column;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
         }
+        
+        .chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         .chat-history {
             flex-grow: 1;
             overflow-y: auto;
             padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            background-color: white;
         }
+        
         .chat-input {
-            margin-top: 20px;
-            position: relative;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: white;
         }
+        
+        .chat-input .form-control {
+            border-radius: 20px;
+            padding-left: 15px;
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-input .btn {
+            border-radius: 20px;
+            padding: 8px 20px;
+        }
+        
         .message {
             margin-bottom: 20px;
             max-width: 80%;
+            animation: fadeIn 0.3s ease;
+            position: relative;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .user-message {
-            background-color: #f0f7ff;
+            background-color: #e6f2ff;
             padding: 15px;
-            border-radius: 15px 15px 0 15px;
+            border-radius: 18px 18px 0 18px;
             margin-left: auto;
-            border: 1px solid #d1e7ff;
+            color: #1a1a1a;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
+        
         .bot-message {
-            background-color: #f8f9fa;
+            background-color: white;
             padding: 15px;
-            border-radius: 15px 15px 15px 0;
+            border-radius: 18px 18px 18px 0;
             margin-right: auto;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        
+        /* Document Cards */
         .document-card {
             cursor: pointer;
-            transition: all 0.2s;
+            transition: var(--transition);
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            height: 100%;
         }
+        
         .document-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
+        
+        .document-card .card-body {
+            padding: 1.25rem;
+        }
+        
+        .document-card .document-icon {
+            font-size: 2rem;
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        
+        .document-card .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        /* Upload Section */
+        .upload-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: var(--transition);
+            background-color: white;
+        }
+        
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-zone .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .selected-files {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            color: #dc3545;
+            margin-right: 10px;
+            font-size: 1.25rem;
+        }
+        
+        .file-name {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+        
+        .file-remove {
+            color: #6c757d;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .file-remove:hover {
+            color: #dc3545;
+        }
+        
+        /* Loading Spinner */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
-            border-top-color: #007bff;
+            border-top-color: var(--primary-color);
             animation: spin 1s ease-in-out infinite;
             margin-left: 10px;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Section Display */
         .section-hidden {
             display: none;
         }
-        #uploadSection .card {
-            border: 1px dashed #dee2e6;
-            background-color: #f8f9fa;
-        }
-        #uploadSection .card:hover {
-            border-color: #6c757d;
+        
+        /* Configuration Section */
+        .config-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: none;
         }
         
-        /* Markdown styling for chat messages */
+        /* Chat History List */
+        .chat-history-list {
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .chat-history-item {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-history-item:hover, .chat-history-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .chat-history-title {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;
+        }
+        
+        .chat-history-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Markdown styling */
         .bot-message h1, .bot-message h2, .bot-message h3 {
-            margin-top: 0.5rem;
+            margin-top: 0.8rem;
             margin-bottom: 0.5rem;
             font-weight: 600;
+            color: var(--dark-color);
         }
+        
         .bot-message h1 {
             font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3rem;
         }
+        
         .bot-message h2 {
             font-size: 1.3rem;
         }
+        
         .bot-message h3 {
             font-size: 1.1rem;
         }
+        
         .bot-message ul, .bot-message ol {
             padding-left: 1.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
         }
+        
         .bot-message p {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
         }
+        
         .bot-message pre {
-            background-color: #f1f1f1;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            padding: 0.8rem;
+            border-radius: 6px;
             overflow-x: auto;
+            border: 1px solid #e9ecef;
+            margin: 0.8rem 0;
         }
+        
         .bot-message code {
             background-color: #f1f1f1;
-            padding: 0.1rem 0.3rem;
-            border-radius: 0.25rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
             font-size: 0.9em;
+            color: #e63946;
         }
+        
         .bot-message strong {
             font-weight: 600;
+            color: #1a1a1a;
         }
+        
         .bot-message table {
             border-collapse: collapse;
-            margin-bottom: 0.5rem;
+            margin: 1rem 0;
             width: 100%;
         }
-        .bot-message th, .bot-message td {
-            border: 1px solid #dee2e6;
-            padding: 0.5rem;
-        }
+        
         .bot-message th {
             background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .bot-message th, .bot-message td {
+            border: 1px solid #dee2e6;
+            padding: 0.6rem;
+        }
+        
+        .bot-message blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1rem;
+            color: #495057;
+            font-style: italic;
+            margin: 1rem 0;
+        }
+        
+        /* Document preview */
+        .document-preview {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        
+        .preview-page {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-page-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+        
+        /* Modal styling */
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            background-color: #f8f9fa;
+            border-radius: 0 0 12px 12px;
         }
     </style>
 </head>
@@ -168,10 +432,30 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4 class="mb-0">Document Analyzer</h4>
-            <p class="text-muted mb-0">Powered by RAG</p>
+            <h4>Document Analyzer</h4>
+            <p class="mb-0 text-white-50">Powered by RAG</p>
         </div>
         <div class="p-3">
+            <!-- Chat History Section -->
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-white">Chat History</h6>
+                    <button class="btn btn-sm text-white" id="newChatBtn" title="New Chat">
+                        <i class="bi bi-plus-circle"></i> New
+                    </button>
+                </div>
+                <div class="chat-history-list mb-3" id="chatHistoryList">
+                    <div class="chat-history-item active">
+                        <div class="chat-history-title">New Chat</div>
+                        <div class="chat-history-date">Just now</div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="border-light">
+            
+            <!-- Navigation -->
+            <h6 class="text-white-50 mb-2">NAVIGATION</h6>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link active" href="#" data-section="chatSection">
@@ -194,9 +478,11 @@
                     </a>
                 </li>
             </ul>
-            <hr>
+            
+            <hr class="border-light">
+            
             <div class="mt-3">
-                <button class="btn btn-outline-danger btn-sm w-100" id="clearBtn">
+                <button class="btn btn-outline-light btn-sm w-100" id="clearBtn">
                     <i class="bi bi-trash"></i> Clear All Documents
                 </button>
             </div>
@@ -207,19 +493,58 @@
     <div class="main-content">
         <!-- Chat Section -->
         <div id="chatSection" class="section">
-            <h4 class="mb-4">Chat with your Documents</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Chat with your Documents</h4>
+                <span class="badge bg-primary py-2 px-3">
+                    <i class="bi bi-files"></i> <span id="documentCount">0</span> Documents
+                </span>
+            </div>
+            
             <div class="chat-container">
+                <div class="chat-header">
+                    <div>
+                        <h5 class="mb-0">Chat Session</h5>
+                        <small class="text-muted">Ask questions about your uploaded documents</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary" id="exportChatBtn">
+                        <i class="bi bi-download"></i> Export
+                    </button>
+                </div>
+                
                 <div class="chat-history" id="chatHistory">
                     <div class="message bot-message">
-                        Hello! I'm your document assistant. Upload PDFs and ask me questions about them.
+                        <h2>Welcome to Document Analyzer!</h2>
+                        <p>I'm your AI assistant powered by RAG technology. I can help you analyze and extract information from your documents.</p>
+                        <p>Here's what you can do:</p>
+                        <ul>
+                            <li><strong>Upload PDFs</strong> - Add your documents to the knowledge base</li>
+                            <li><strong>Ask questions</strong> - Query information from your documents</li>
+                            <li><strong>Manage documents</strong> - View and organize your uploaded files</li>
+                        </ul>
+                        <p>To get started, upload some PDF documents or ask me a question if you've already uploaded documents.</p>
                     </div>
                 </div>
+                
                 <div class="chat-input">
                     <div class="input-group">
+                        <button class="btn btn-outline-secondary" type="button" id="searchModeBtn" title="Toggle Search Mode">
+                            <i class="bi bi-search"></i>
+                        </button>
                         <input type="text" class="form-control" id="queryInput" placeholder="Ask a question about your documents...">
-                        <button class="btn btn-primary" id="queryBtn">Send</button>
+                        <button class="btn btn-primary" id="queryBtn">
+                            <i class="bi bi-send"></i> Send
+                        </button>
                     </div>
-                    <span id="queryLoading" class="loading mt-2" style="display: none;"></span>
+                    <div class="mt-2 d-flex justify-content-between">
+                        <div>
+                            <small class="text-muted" id="searchModeIndicator">
+                                <i class="bi bi-info-circle"></i> Searching in: <span>Document Knowledge Base</span>
+                            </small>
+                        </div>
+                        <div>
+                            <span id="queryLoading" class="loading" style="display: none;"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -227,34 +552,100 @@
         <!-- Upload Section -->
         <div id="uploadSection" class="section section-hidden">
             <h4 class="mb-4">Upload Documents</h4>
-            <div class="card mb-4 p-4">
-                <form id="uploadForm" enctype="multipart/form-data" method="POST">
-                    <div class="text-center p-4">
-                        <i class="bi bi-cloud-arrow-up fs-1 text-primary"></i>
-                        <h5 class="mt-3">Drag & Drop Files Here</h5>
-                        <p class="text-muted">or</p>
-                        <div class="mb-3">
-                            <input class="form-control" type="file" id="pdfFiles" name="files" accept=".pdf" multiple hidden>
-                            <button type="button" class="btn btn-outline-primary" id="browseBtn">Browse Files</button>
+            
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <form id="uploadForm" enctype="multipart/form-data" method="POST">
+                        <div class="upload-zone" id="dropZone">
+                            <div class="upload-icon">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                            </div>
+                            <h5>Drag & Drop PDF Files Here</h5>
+                            <p class="text-muted mb-3">or</p>
+                            <div class="mb-3">
+                                <input class="form-control" type="file" id="pdfFiles" name="files" accept=".pdf" multiple hidden>
+                                <button type="button" class="btn btn-primary" id="browseBtn">
+                                    <i class="bi bi-folder"></i> Browse Files
+                                </button>
+                            </div>
+                            <p class="text-muted small">Supported formats: PDF | Max file size: 10MB</p>
                         </div>
-                        <p class="text-muted small">Supported formats: PDF</p>
+                        
+                        <div class="selected-files" id="filesList" style="display: none;">
+                            <h6 class="mb-3">Selected Files</h6>
+                            <!-- Files will be listed here -->
+                        </div>
+                        
+                        <div class="text-center p-3">
+                            <button type="submit" class="btn btn-primary px-4" id="uploadBtn" disabled>
+                                <i class="bi bi-arrow-up-square"></i> Upload Files
+                            </button>
+                            <span id="uploadLoading" class="loading" style="display: none;"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-lightbulb text-warning"></i>
+                                Processing Information
+                            </h5>
+                            <p class="card-text">When you upload PDF files, they are:</p>
+                            <ol>
+                                <li>Extracted into text</li>
+                                <li>Split into smaller chunks</li>
+                                <li>Embedded using vector representations</li>
+                                <li>Stored in a vector database for fast retrieval</li>
+                            </ol>
+                            <p class="card-text text-muted">This process enables semantic search and retrieval based on meaning rather than just keywords.</p>
+                        </div>
                     </div>
-                    <div id="filesList" class="mt-3"></div>
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary" id="uploadBtn" disabled>Upload Files</button>
-                        <span id="uploadLoading" class="loading" style="display: none;"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-exclamation-triangle text-danger"></i>
+                                Important Notes
+                            </h5>
+                            <ul>
+                                <li>PDF files should contain selectable text, not just images</li>
+                                <li>Text-based PDFs work best for accurate information extraction</li>
+                                <li>Scanned documents may not be processed correctly without OCR</li>
+                                <li>Protected PDFs with encryption cannot be processed</li>
+                            </ul>
+                            <p class="card-text text-muted">For best results, use digital PDFs rather than scanned documents.</p>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
 
         <!-- Documents Management Section -->
         <div id="documentsSection" class="section section-hidden">
-            <h4 class="mb-4">Manage Documents</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0">Manage Documents</h4>
+                <div>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="documentSearch" placeholder="Search documents...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row" id="documentsList">
                 <div class="col-12 text-center text-muted py-5">
                     <i class="bi bi-inbox fs-1"></i>
                     <p class="mt-3">No documents uploaded yet</p>
+                    <button class="btn btn-primary mt-2" id="goToUploadBtn">
+                        <i class="bi bi-file-earmark-arrow-up"></i> Upload Documents
+                    </button>
                 </div>
             </div>
         </div>
@@ -262,23 +653,106 @@
         <!-- Configuration Section -->
         <div id="configSection" class="section section-hidden">
             <h4 class="mb-4">Configuration</h4>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form id="configForm">
-                        <div class="mb-3">
-                            <label for="apiUrlInput" class="form-label">API URL</label>
-                            <div class="input-group">
-                                <input type="url" class="form-control" id="apiUrlInput" placeholder="https://your-api-url.com">
-                                <button class="btn btn-primary" type="submit">Save</button>
-                            </div>
-                            <div class="form-text" id="apiUrlStatus">
-                                Current API URL: <span id="currentApiUrl">Loading...</span>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card config-card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">API Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="configForm">
+                                <div class="mb-3">
+                                    <label for="apiUrlInput" class="form-label">API URL</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </span>
+                                        <input type="url" class="form-control" id="apiUrlInput" placeholder="https://your-api-url.com">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                    </div>
+                                    <div class="form-text" id="apiUrlStatus">
+                                        Current API URL: <span id="currentApiUrl">Loading...</span>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="bi bi-info-circle me-2"></i> 
+                                <div>
+                                    Leave blank to use the current domain: <code id="originUrl"></code>
+                                </div>
                             </div>
                         </div>
-                    </form>
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        Leave blank to use the current domain: <code id="originUrl"></code>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card config-card mb-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">System Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p><strong>Storage:</strong> <span id="vectorStoreSize">Loading...</span></p>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" id="storageProgress"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <p><strong>Document Statistics:</strong></p>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Documents
+                                        <span class="badge bg-primary rounded-pill" id="statsDocumentCount">0</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Text Chunks
+                                        <span class="badge bg-primary rounded-pill" id="statsChunkCount">0</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" id="testConnectionBtn">
+                                    <i class="bi bi-broadcast"></i> Test API Connection
+                                </button>
+                                <button class="btn btn-outline-danger" id="clearAllDataBtn">
+                                    <i class="bi bi-trash"></i> Clear All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card config-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Troubleshooting</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-secondary" id="debugConnectionBtn">
+                                    <i class="bi bi-bug"></i> Debug Connection
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-secondary" id="resetUploadMethodBtn">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset Upload Method
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-secondary" id="exportLogsBtn">
+                                    <i class="bi bi-file-earmark-text"></i> Export Logs
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -287,28 +761,89 @@
 
     <!-- Document Detail Modal -->
     <div class="modal fade" id="documentModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="documentModalTitle">Document Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="documentModalBody">
-                    <div class="mb-3">
-                        <strong>Filename:</strong> <span id="docFilename"></span>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Filename:</strong> 
+                                <span id="docFilename"></span>
+                            </div>
+                            <div class="mb-3">
+                                <strong><i class="bi bi-calendar me-2"></i>Upload Time:</strong> 
+                                <span id="docUploadTime"></span>
+                            </div>
+                            <div class="mb-3">
+                                <strong><i class="bi bi-list-ul me-2"></i>Chunks:</strong> 
+                                <span id="docChunks"></span>
+                            </div>
+                            <div class="mb-3">
+                                <strong><i class="bi bi-key me-2"></i>ID:</strong> 
+                                <span id="docId"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-2">Content Preview</h6>
+                            <div class="document-preview" id="documentPreview">
+                                <div class="text-center text-muted py-4">
+                                    <i class="bi bi-file-earmark-text fs-1"></i>
+                                    <p class="mt-2">Select a chunk to preview content</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <strong>Upload Time:</strong> <span id="docUploadTime"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Chunks:</strong> <span id="docChunks"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>ID:</strong> <span id="docId"></span>
+                    
+                    <hr>
+                    
+                    <h6>Document Chunks</h6>
+                    <div class="row" id="chunksList">
+                        <!-- Chunks will be listed here -->
+                        <div class="col-12 text-center text-muted py-3">
+                            <p>Loading chunks...</p>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" id="askAboutDocBtn">
+                        <i class="bi bi-chat-left-text"></i> Ask About This Document
+                    </button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Mode Modal -->
+    <div class="modal fade" id="searchModeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select Search Mode</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="searchMode" id="documentSearchMode" value="document" checked>
+                        <label class="form-check-label" for="documentSearchMode">
+                            <strong>Document Search</strong>
+                            <p class="text-muted small mb-0">Search within your uploaded documents only</p>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="searchMode" id="webSearchMode" value="web">
+                        <label class="form-check-label" for="webSearchMode">
+                            <strong>Web Search</strong>
+                            <p class="text-muted small mb-0">Search the web for additional information</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="confirmSearchMode">Apply</button>
                 </div>
             </div>
         </div>

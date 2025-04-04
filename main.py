@@ -53,6 +53,7 @@ if not mistral_api_key:
 
 class QueryRequest(BaseModel):
     query: str
+    formatting_instructions: str = ""
 
 
 class MistralAIWrapper(LLM):
@@ -163,7 +164,6 @@ async def upload_documents(files: List[UploadFile] = File(...)):
 @app.get("/list-documents")
 async def list_documents():
     """List all PDF documents saved in the database."""
-    print(document_registry)
     try:
         # Return the list of documents from our registry
         if document_registry:
@@ -181,8 +181,9 @@ async def list_documents():
         else:
             # Try to get available documents from vector store if registry is empty
             try:
+                print("Inside try block;;;;;;;;;;;;;;;;;;;;;;;-----------------------")
                 all_docs = vector_store.vectorstore.get()
-                print(all_docs)
+                # print(all_docs)
                 unique_sources = set()
                 for doc in all_docs.get("documents", []):
                     if "source" in doc["metadata"]:
@@ -216,10 +217,19 @@ async def query_documents(request: QueryRequest):
         
         # Create context from retrieved documents
         context = "\n\n".join([doc.page_content for doc in docs])
-
   
         try:
-             # Creating a proper RAG prompt that includes both context and question
+            # Default formatting instructions if none provided
+            formatting_instructions = request.formatting_instructions or """
+                - Use markdown formatting to structure your response
+                - Include a clear heading/title at the top when appropriate
+                - Use bullet points or numbered lists for multiple items or steps
+                - Bold important terms or key points
+                - Use subheadings to organize longer responses
+                - Keep your answer concise and well-structured
+            """
+            
+            # Creating a proper RAG prompt that includes both context and question
             prompt = f"""
             Answer the following question based on this context:
 
@@ -229,21 +239,13 @@ async def query_documents(request: QueryRequest):
             Question: {request.query}
 
             Instructions for your answer:
-            1. Use markdown formatting to structure your response
-            2. Include a clear heading/title at the top when appropriate
-            3. Use bullet points or numbered lists for multiple items or steps
-            4. Bold important terms or key points
-            5. Use subheadings to organize longer responses
-            6. Keep your answer concise and well-structured
-            7. If appropriate, include a brief summary at the end
+            {formatting_instructions}
 
             Answer:
             """
             
             direct_response = llm._call(prompt)
             return {"response": direct_response}
-        
-        
         except Exception as llm_error:
             print(f"LLM call error: {str(llm_error)}")
             return {"response": f"Error generating response. Please try again later.", "error": str(llm_error)}

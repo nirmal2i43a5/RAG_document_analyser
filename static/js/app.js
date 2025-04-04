@@ -84,7 +84,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function addChatMessage(message, isUser = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        messageDiv.textContent = message;
+        
+        // Use marked.js to render markdown for bot messages
+        if (!isUser) {
+            messageDiv.innerHTML = marked.parse(message);
+        } else {
+            messageDiv.textContent = message;
+        }
+        
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
@@ -328,12 +335,28 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             showLoading(queryLoading);
+            
+            // Create a request with structured formatting instructions
+            const requestBody = {
+                query: query,
+                formatting_instructions: `
+                    Please format your response with clear structure:
+                    1. Use markdown headings (# for main headings, ## for subheadings)
+                    2. Use bullet points (- or *) for lists
+                    3. Use numbered lists (1., 2., etc.) for sequential steps
+                    4. **Bold** important terms or key concepts
+                    5. Add horizontal rules (---) to separate main sections
+                    6. Use code blocks for examples where relevant
+                    7. Include a brief summary at the end if appropriate
+                `
+            };
+            
             const response = await fetch(`${API_URL}/query`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ query: query })
+                body: JSON.stringify(requestBody)
             });
             
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
