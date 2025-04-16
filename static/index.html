@@ -386,13 +386,18 @@
         
         /* Document preview */
         .document-preview {
-            background-color: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
             height: 300px;
-            overflow-y: auto;
-            margin-top: 15px;
+            max-height: 50vh;
+        }
+        
+        .document-preview iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            background-color: #f8f9fa;
         }
         
         .preview-page {
@@ -636,9 +641,14 @@
                             <h6 class="mb-2">Content Preview</h6>
                             <div class="document-preview" id="documentPreview">
                                 <div class="text-center text-muted py-4">
-                                    <i class="bi bi-file-earmark-text fs-1"></i>
-                                    <p class="mt-2">Select a chunk to preview content</p>
+                                    <i class="bi bi-file-earmark-pdf fs-1"></i>
+                                    <p class="mt-2">Loading preview...</p>
                                 </div>
+                            </div>
+                            <div class="mt-2 text-end">
+                                <a href="#" id="openFullPdf" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                    <i class="bi bi-arrows-fullscreen"></i> Open in Full Screen
+                                </a>
                             </div>
                         </div>
                     </div>

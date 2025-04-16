@@ -146,6 +146,10 @@ def save_registry():
     except Exception as e:
         print(f"Error saving document registry: {str(e)}")
 
+# Create a directory to store uploaded PDFs for preview
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 @app.post("/upload")
 async def upload_documents(files: List[UploadFile] = File(...)):
     """Upload PDF documents and process them."""

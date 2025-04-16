@@ -166,14 +166,44 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p class="card-text">
                                 <span class="badge bg-primary">${doc.chunks} chunks</span>
                             </p>
+                            <div class="mt-3 d-flex justify-content-between">
+                                <button class="btn btn-sm btn-outline-primary view-doc-btn">
+                                    <i class="bi bi-eye"></i> View
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary details-doc-btn">
+                                    <i class="bi bi-info-circle"></i> Details
+                                </button>
+                            </div>
                         </div>
                     `;
                     
-                    // Add click event to show document details
-                    card.addEventListener('click', () => showDocumentDetails(doc));
-                    
+                    // Add event listeners for the buttons
                     colDiv.appendChild(card);
                     documentsList.appendChild(colDiv);
+                    
+                    // Add click events after the card is in the DOM
+                    const viewBtn = colDiv.querySelector('.view-doc-btn');
+                    const detailsBtn = colDiv.querySelector('.details-doc-btn');
+                    
+                    // View button opens the PDF directly
+                    viewBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent card click
+                        // Use a direct URL with document ID to ensure the PDF extension is shown in browser
+                        const pdfUrl = `${API_URL}/document/${doc.id}`;
+                        console.log("Opening PDF at URL:", pdfUrl);
+                        window.open(pdfUrl, '_blank');
+                    });
+                    
+                    // Details button opens the modal
+                    detailsBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent card click
+                        showDocumentDetails(doc);
+                    });
+                    
+                    // Card click defaults to view
+                    card.addEventListener('click', () => {
+                        window.open(`${API_URL}/document/${doc.id}`, '_blank');
+                    });
                 });
             } else {
                 documentsList.innerHTML = `
