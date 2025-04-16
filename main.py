@@ -20,31 +20,26 @@ from typing import Any, Dict, List, Mapping, Optional
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from pydantic import BaseModel
 from mistralai.models.chat_completion import ChatMessage
-
 from langchain.schema import Document
 from datetime import datetime
 import json
 
 # Load environment variables
 load_dotenv()
-
 app = FastAPI(title="Document Analyzer RAG")
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Mount static files directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
+
 # Initialize components
+'''Chunking and processing of PDF files'''
 pdf_processor = PDFProcessor()
+
+
+'''Embedding'''
 vector_store = VectorStore()
+
+
 
 # Initialize Mistral AI
 # mistral_api_key = os.getenv("API_KEY")
@@ -55,6 +50,8 @@ if not mistral_api_key:
 class QueryRequest(BaseModel):
     query: str
     formatting_instructions: str = ""
+
+
 
 
 class MistralAIWrapper(LLM):
@@ -124,6 +121,12 @@ class MistralAIWrapper(LLM):
 
 llm = MistralAIWrapper(api_key=mistral_api_key, model_name="mistral-tiny")
 
+
+
+'''
+Memory management and caching
+'''
+
 # Path to document registry file
 document_registry_file = "document_registry.json"
 
@@ -150,6 +153,8 @@ def save_registry():
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
+
 @app.post("/upload")
 async def upload_documents(files: List[UploadFile] = File(...)):
     """Upload PDF documents and process them."""
@@ -166,7 +171,9 @@ async def upload_documents(files: List[UploadFile] = File(...)):
                     content = await file.read()
                     buffer.write(content)
                 
+                
                 # Process the PDF
+                
                 chunks = pdf_processor.process_pdf(file_path)
                 
                 # Add proper metadata to each chunk
@@ -195,6 +202,74 @@ async def upload_documents(files: List[UploadFile] = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+
+
+@app.post("/query")
+async def query_documents(request: QueryRequest):
+    """Query the document collection."""
+    
+    try:
+        '''
+        Retrieval of documents based on the query
+        '''
+        docs = vector_store.similarity_search(request.query)
+        if not docs:
+            return {"response": "No relevant documents found. Please upload documents first."}
+            
+        
+        # Create context from retrieved documents
+        context = "\n\n".join([doc.page_content for doc in docs])
+  
+        try:
+            # Default formatting instructions if none provided
+            formatting_instructions = request.formatting_instructions or """
+                - Use markdown formatting to structure your response
+                - Include a clear heading/title at the top when appropriate
+                - Use bullet points or numbered lists for multiple items or steps
+                - Bold important terms or key points
+                - Use subheadings to organize longer responses
+                - Keep your answer concise and well-structured
+            """
+            
+            # Creating a proper RAG prompt that includes both context and question
+            '''
+            Prompting the LLM with context and question
+            '''
+            prompt = f"""
+            Answer the following question based on this context:
+
+            Context:
+            {context}
+
+            Question: {request.query}
+
+            Instructions for your answer:
+            {formatting_instructions}
+
+            Answer:
+            """
+            
+            direct_response = llm._call(prompt)
+            return {"response": direct_response}
+        
+        except Exception as llm_error:
+            print(f"LLM call error: {str(llm_error)}")
+            return {"response": f"Error generating response. Please try again later.", "error": str(llm_error)}
+    
+    except Exception as e:
+        print(f"Error in query: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
+
+
+
+
+@app.get("/")
+async def root():
+    """Serve the main HTML page"""
+    return FileResponse('static/index.html')
 
 @app.get("/list-documents")
 async def list_documents():
@@ -246,63 +321,9 @@ async def list_documents():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-
-@app.post("/query")
-async def query_documents(request: QueryRequest):
-    """Query the document collection."""
-    
-    try:
-        # Retrieve documents
-        docs = vector_store.similarity_search(request.query)
-        if not docs:
-            return {"response": "No relevant documents found. Please upload documents first."}
-            
-        print("Found relevant documents")
-        
-        # Create context from retrieved documents
-        context = "\n\n".join([doc.page_content for doc in docs])
-  
-        try:
-            # Default formatting instructions if none provided
-            formatting_instructions = request.formatting_instructions or """
-                - Use markdown formatting to structure your response
-                - Include a clear heading/title at the top when appropriate
-                - Use bullet points or numbered lists for multiple items or steps
-                - Bold important terms or key points
-                - Use subheadings to organize longer responses
-                - Keep your answer concise and well-structured
-            """
-            
-            # Creating a proper RAG prompt that includes both context and question
-            prompt = f"""
-            Answer the following question based on this context:
-
-            Context:
-            {context}
-
-            Question: {request.query}
-
-            Instructions for your answer:
-            {formatting_instructions}
-
-            Answer:
-            """
-            
-            direct_response = llm._call(prompt)
-            return {"response": direct_response}
-        except Exception as llm_error:
-            print(f"LLM call error: {str(llm_error)}")
-            return {"response": f"Error generating response. Please try again later.", "error": str(llm_error)}
-    
-    except Exception as e:
-        print(f"Error in query: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-    
-
 @app.post("/clear")
 async def clear_documents():
+    print("Inside clear_documents--------------------------")
     """Clear all documents from the vector store."""
     try:
         vector_store.clear()
@@ -315,12 +336,6 @@ async def clear_documents():
     except Exception as e:
         print(f"Error clearing documents: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/")
-async def root():
-    """Serve the main HTML page"""
-    return FileResponse('static/index.html')
 
 if __name__ == "__main__":
     import uvicorn

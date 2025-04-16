@@ -1,5 +1,4 @@
 from typing import List
-from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 import os
