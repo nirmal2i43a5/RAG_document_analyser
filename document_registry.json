@@ -1,77 +1,7 @@
 {
   "fe4e250e44071bdf06137b27d872cea2": {
     "filename": "Generative AI.pdf",
-    "upload_time": "2025-04-15T23:58:21.297617",
+    "upload_time": "2025-04-16T09:07:11.624230",
     "chunks": 14
-  },
-  "aef71301edc9a9a4d8d05e6f215f63ea": {
-    "filename": "Agentic RAG.pdf",
-    "upload_time": "2025-04-15T23:58:22.495765",
-    "chunks": 11
-  },
-  "053779ea052ba020a0bde103d9063c90": {
-    "filename": "Deep Learning.pdf",
-    "upload_time": "2025-04-15T23:57:24.246274",
-    "chunks": 8
-  },
-  "74a2cc620e59c0ff6a499dc6ebfdb202": {
-    "filename": "Unsupervised Learning.pdf",
-    "upload_time": "2025-04-15T23:57:24.864014",
-    "chunks": 10
-  },
-  "9dce68a510f7db77737e32fe085d37cf": {
-    "filename": "trained4.pdf",
-    "upload_time": "2025-04-15T23:57:36.287128",
-    "chunks": 1
-  },
-  "96fa018aad9a370e51ebd4155fc7d23a": {
-    "filename": "NLP.pdf",
-    "upload_time": "2025-04-15T23:57:35.298909",
-    "chunks": 11
-  },
-  "d4eab5209f4588d3bafa292c33944d24": {
-    "filename": "RAG.pdf",
-    "upload_time": "2025-04-15T23:57:35.858682",
-    "chunks": 9
-  },
-  "60423def08238bfb8d91d15c1d55cb60": {
-    "filename": "c0943333_REFLECTION_QUESTIONS_PART_2.pdf",
-    "upload_time": "2025-04-15T23:57:42.814264",
-    "chunks": 12
-  },
-  "93fb67007ae3a69f56d42eb971a51ab1": {
-    "filename": "Final - review.pdf",
-    "upload_time": "2025-04-04T02:13:05.335235",
-    "chunks": 3
-  },
-  "02a443c7b5c2cdd72081fa0506e52af7": {
-    "filename": "Week12-AML2503-2025.pdf",
-    "upload_time": "2025-04-15T23:52:20.525238",
-    "chunks": 45
-  },
-  "5f11ac2b0fd510cd7fb8552a47cb0bd3": {
-    "filename": "Supervised Learning.pdf",
-    "upload_time": "2025-04-15T23:57:29.799160",
-    "chunks": 14
-  },
-  "103840f7ab1bcf9efe3b91d0fd1024fe": {
-    "filename": "Machine Learning Fundamentals.pdf",
-    "upload_time": "2025-04-15T23:57:34.735631",
-    "chunks": 12
-  },
-  "cc96856c39cd7b5dbb0a1cfcf57d1c35": {
-    "filename": "Trained3.pdf",
-    "upload_time": "2025-04-15T23:57:37.161777",
-    "chunks": 51
-  },
-  "f98f5e058ec8752b7feea71068d62d1d": {
-    "filename": "s12525-023-00680-1.pdf",
-    "upload_time": "2025-04-15T23:57:43.826869",
-    "chunks": 126
-  },
-  "17edf2ea9fbbb566e27be84be32bcd91": {
-    "filename": "Storytelling with data a data visualization guide.pdf",
-    "upload_time": "2025-04-15T23:57:55.937471",
-    "chunks": 1945
   }
 }
