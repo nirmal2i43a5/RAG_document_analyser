@@ -271,13 +271,11 @@ async def query_documents(request: QueryRequest):
 
     
 
-
-
-
 @app.get("/")
 async def root():
     """Serve the main HTML page"""
     return FileResponse('static/index.html')
+
 
 @app.get("/list-documents")
 async def list_documents():
