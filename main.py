@@ -28,6 +28,14 @@ import json
 load_dotenv()
 app = FastAPI(title="Document Analyzer RAG")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 
