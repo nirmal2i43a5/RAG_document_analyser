@@ -64,14 +64,19 @@ class VectorStore:
         try:
             print("Clearing vector store")
             # Use the collection.delete method with an empty filter to delete all documents
-            self.vectorstore._collection.delete(filter={})
+            # self.vectorstore._collection.delete()
+            all_ids = self.vectorstore._collection.get()["ids"]
+            print(all_ids)
+            if all_ids:
+                self.vectorstore._collection.delete(ids=all_ids)
+
+            
             # Persist changes to disk
             self.vectorstore.persist()
             
             # Also clear the document registry
             global document_registry
             document_registry = {}
-            # Save empty registry to file
             save_registry()
             
             print("Vector store cleared successfully")
